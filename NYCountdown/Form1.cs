@@ -17,29 +17,30 @@ namespace NYCountdown
             InitializeComponent();
         }
 
+        private char[] draw = { '0', '1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+        private int drawpos = 0;
+
         private void glControl1_Load(object sender, EventArgs e)
         {
-
+            timer1.Start();
         }
 
         private void glControl1_Paint(object sender, PaintEventArgs e)
         {
+           
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
 
             GL.Color3(Color.Red);
-
-
-            drawSeg1();
-            drawSeg2();
-            drawSeg3();
-            drawSeg4();
-            drawSeg5();
-            drawSeg6();
-            drawSeg7();
+            GL.Scale(0.5,0.5,1);
+            drawChar(draw[drawpos]);
 
             glControl1.SwapBuffers();
         }
 
+        #region segments
         private static void drawSSeg1()
         {
             GL.Begin(BeginMode.Polygon);
@@ -74,6 +75,7 @@ namespace NYCountdown
             GL.End();
         }
 
+       
         private static void drawSSeg3()
         {
             GL.PushMatrix();
@@ -199,14 +201,134 @@ namespace NYCountdown
             }
             GL.PopMatrix();
         }
-
+        #endregion
+       
         private void glControl1_Resize(object sender, EventArgs e)
         {
-         //   GL.Viewport(this.ClientRectangle);
-          //  GL.MatrixMode(MatrixMode.Projection);
-         //   GL.LoadIdentity();
-         //   GL.Ortho(0, glControl1.Width, glControl1.Height, 0, -1, 0);
+            GL.Viewport(this.ClientRectangle);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+           // GL.Ortho(0, glControl1.Width, glControl1.Height, 0, -1, 1);
+            glControl1.Invalidate();
         }
+
+        private void drawChar(char x)
+        {
+            if (
+                x == '4' ||
+                x == '5' ||
+                x == '6' ||
+                x == '8' ||
+                x == '9' ||
+                x == '0' ||
+                x == 'a' ||
+                x == 'b' ||
+                x == 'c' ||
+                x == 'e' ||
+                x == 'f' )
+            {
+                drawSeg1();
+            }
+            if (
+                x == '2' ||
+                x == '3' ||
+                x == '5' ||
+                x == '6' ||
+                x == '7' ||
+                x == '8' ||
+                x == '9' ||
+                x == '0' ||
+                x == 'a' ||
+                x == 'c' ||
+                x == 'e' ||
+                x == 'f' )
+            {
+                drawSeg2();
+            }
+            if (
+                x == '1' ||
+                x == '2' ||
+                x == '3' ||
+                x == '4' ||
+                x == '7' ||
+                x == '8' ||
+                x == '9' ||
+                x == '0' ||
+                x == 'a' ||
+                x == 'd' )
+            {
+                drawSeg3();
+            }
+            if (
+                x == '1' ||
+                x == '3' ||
+                x == '4' ||
+                x == '5' ||
+                x == '6' ||
+                x == '7' ||
+                x == '8' ||
+                x == '9' ||
+                x == '0' ||
+                x == 'a' ||
+                x == 'b' ||
+                x == 'd' )
+            {
+                drawSeg4();
+            }
+            if (
+                x == '2' ||
+                x == '3' ||
+                x == '5' ||
+                x == '6' ||
+                x == '8' ||
+                x == '9' ||
+                x == '0' ||
+                x == 'b' ||
+                x == 'c' ||
+                x == 'd' ||
+                x == 'e' )
+            {
+                drawSeg5();
+            }
+            if (
+                x == '2' ||
+                x == '6' ||
+                x == '8' ||
+                x == '0' ||
+                x == 'a' ||
+                x == 'b' ||
+                x == 'c' ||
+                x == 'd' ||
+                x == 'e' ||
+                x == 'f' )
+            {
+                drawSeg6();
+            }
+            if (
+                x == '2' ||
+                x == '3' ||
+                x == '4' ||
+                x == '5' ||
+                x == '6' ||
+                x == '8' ||
+                x == '9' ||
+                x == 'a' ||
+                x == 'b' ||
+                x == 'd' ||
+                x == 'e' ||
+                x == 'f' )
+            {
+                drawSeg7();
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            drawpos += 1;
+            drawpos = drawpos%16;
+            glControl1.Invalidate();
+        }
+
 
     }
 }
