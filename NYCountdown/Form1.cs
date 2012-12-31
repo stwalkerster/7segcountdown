@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
@@ -17,8 +13,7 @@ namespace NYCountdown
             InitializeComponent();
         }
 
-        private char[] draw = { '0', '1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-        private int drawpos = 0;
+        private string days = "0", hours = "0", minutes = "0", seconds = "0";
 
         private void glControl1_Load(object sender, EventArgs e)
         {
@@ -27,20 +22,66 @@ namespace NYCountdown
 
         private void glControl1_Paint(object sender, PaintEventArgs e)
         {
-           
-
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
+            GL.Scale(0.25, 0.25, 1);
+            double halfwidth = 145*(0.5/91);
+
             GL.Color3(Color.Red);
-            GL.Scale(0.5,0.5,1);
-            drawChar(draw[drawpos]);
+            GL.PushMatrix();
+            {
+                GL.Translate(-8*halfwidth,0,0);
+                drawDays(days);
+            }
+            GL.PopMatrix();
+
+          //  GL.Color3(Color.Orange);
+            GL.PushMatrix();
+            {
+                GL.Translate(-2 * halfwidth, 0, 0);
+                drawPair(hours);
+            }
+            GL.PopMatrix();
+
+          //  GL.Color3(Color.Yellow);
+            GL.PushMatrix();
+            {
+                GL.Translate(1 * halfwidth, 0, 0);
+                drawColon();
+            }
+            GL.PopMatrix();
+
+          //  GL.Color3(Color.GreenYellow);
+            GL.PushMatrix();
+            {
+                GL.Translate(4 * halfwidth, 0, 0);
+                drawPair(minutes);
+            }
+            GL.PopMatrix();
+
+          //  GL.Color3(Color.Cyan);
+            GL.PushMatrix();
+            {
+                GL.Translate(7 * halfwidth, 0, 0);
+                drawColon();
+            }
+            GL.PopMatrix();
+            
+           // GL.Color3(Color.Blue);
+            GL.PushMatrix();
+            {
+                GL.Translate(10 * halfwidth, 0, 0);
+                drawPair(seconds);
+            }
+            GL.PopMatrix();
 
             glControl1.SwapBuffers();
         }
 
         #region segments
+
         private static void drawSSeg1()
         {
             GL.Begin(BeginMode.Polygon);
@@ -53,7 +94,7 @@ namespace NYCountdown
                 // bottom/central corner
                 GL.Vertex2(25*(0.5/91), -77*(0.5/91));
                 GL.Vertex2(0, -100*(0.5/91));
-                GL.Vertex2(-25*(0.5/91), -77*(0.5/91));
+                GL.Vertex2(-25*(0.5/91), -100*(0.5/91));
             }
             GL.End();
         }
@@ -75,7 +116,7 @@ namespace NYCountdown
             GL.End();
         }
 
-       
+
         private static void drawSSeg3()
         {
             GL.PushMatrix();
@@ -201,14 +242,16 @@ namespace NYCountdown
             }
             GL.PopMatrix();
         }
+
         #endregion
-       
+
         private void glControl1_Resize(object sender, EventArgs e)
         {
             GL.Viewport(this.ClientRectangle);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-           // GL.Ortho(0, glControl1.Width, glControl1.Height, 0, -1, 1);
+            double aspect = (double) glControl1.Width / glControl1.Height;
+            GL.Ortho(-2 * aspect, 2 * aspect, -2, 2, -1, 1);
             glControl1.Invalidate();
         }
 
@@ -225,7 +268,7 @@ namespace NYCountdown
                 x == 'b' ||
                 x == 'c' ||
                 x == 'e' ||
-                x == 'f' )
+                x == 'f')
             {
                 drawSeg1();
             }
@@ -241,7 +284,7 @@ namespace NYCountdown
                 x == 'a' ||
                 x == 'c' ||
                 x == 'e' ||
-                x == 'f' )
+                x == 'f')
             {
                 drawSeg2();
             }
@@ -255,7 +298,7 @@ namespace NYCountdown
                 x == '9' ||
                 x == '0' ||
                 x == 'a' ||
-                x == 'd' )
+                x == 'd')
             {
                 drawSeg3();
             }
@@ -271,7 +314,7 @@ namespace NYCountdown
                 x == '0' ||
                 x == 'a' ||
                 x == 'b' ||
-                x == 'd' )
+                x == 'd')
             {
                 drawSeg4();
             }
@@ -286,7 +329,7 @@ namespace NYCountdown
                 x == 'b' ||
                 x == 'c' ||
                 x == 'd' ||
-                x == 'e' )
+                x == 'e')
             {
                 drawSeg5();
             }
@@ -300,7 +343,7 @@ namespace NYCountdown
                 x == 'c' ||
                 x == 'd' ||
                 x == 'e' ||
-                x == 'f' )
+                x == 'f')
             {
                 drawSeg6();
             }
@@ -316,7 +359,8 @@ namespace NYCountdown
                 x == 'b' ||
                 x == 'd' ||
                 x == 'e' ||
-                x == 'f' )
+                x == 'f' ||
+                x == '-')
             {
                 drawSeg7();
             }
@@ -324,11 +368,126 @@ namespace NYCountdown
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            drawpos += 1;
-            drawpos = drawpos%16;
+            TimeSpan timeSpan = new DateTime(2013, 1, 1, 0, 0, 0) - DateTime.Now;
+
+            days = Math.Floor(timeSpan.TotalDays) + "";
+            hours = timeSpan.Hours + "";
+            minutes = timeSpan.Minutes + "";
+            seconds = timeSpan.Seconds + "";
+
             glControl1.Invalidate();
         }
 
+        private void drawDot()
+        {
+            double size = 0.15;
+
+            GL.Begin(BeginMode.Quads);
+            {
+                GL.Vertex2(size, size);
+                GL.Vertex2(size, -size);
+                GL.Vertex2(-size, -size);
+                GL.Vertex2(-size, size);
+            }
+            GL.End();
+        }
+
+        private void drawColon()
+        {
+            double sep = 0.5;
+            GL.PushMatrix();
+            {
+                GL.Translate(0, sep, 0);
+                drawDot();
+            }
+            GL.PopMatrix();
+            GL.PushMatrix();
+            {
+                GL.Translate(0, -sep, 0);
+                drawDot();
+            }
+            GL.PopMatrix();
+        }
+
+        private void drawPair(string data)
+        {
+            double sep = 145*(0.5/91);
+
+            if (data.Length >= 2)
+            {
+                GL.PushMatrix();
+                {
+                    GL.Translate(-sep, 0, 0);
+                    drawChar(data[0]);
+                }
+                GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(sep, 0, 0);
+                    drawChar(data[1]);
+                }
+                GL.PopMatrix();
+            }
+            if (data.Length == 1)
+            {
+                GL.PushMatrix();
+                {
+                    GL.Translate(-sep, 0, 0);
+                    drawChar('0');
+                }
+                GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(sep, 0, 0);
+                    drawChar(data[0]);
+                }
+                GL.PopMatrix();
+            }
+            if (data.Length == 0)
+            {
+                GL.PushMatrix();
+                {
+                    GL.Translate(-sep, 0, 0);
+                    drawChar('0');
+                }
+                GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(sep, 0, 0);
+                    drawChar('0');
+                }
+                GL.PopMatrix();
+            }
+        }
+
+        private void drawDays(string data)
+        {
+            double sep = 145*(0.5/91);
+
+            if (data.Length < 3)
+            {
+                data = data.PadLeft(3, '0');
+            }
+
+
+            GL.PushMatrix();
+            {
+                GL.Translate(-sep, 0, 0);
+                drawChar(data[1]);
+                GL.Translate(-(sep*2), 0, 0);
+                drawChar(data[0]);
+            }
+            GL.PopMatrix();
+            GL.PushMatrix();
+            {
+                GL.Translate(sep, 0, 0);
+                drawChar(data[2]);
+                GL.Translate((sep * 2), 0, 0);
+                drawChar('d');
+            }
+            GL.PopMatrix();
+
+        }
 
     }
 }
