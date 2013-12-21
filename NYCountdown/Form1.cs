@@ -6,6 +6,8 @@ using OpenTK.Graphics.OpenGL;
 
 namespace NYCountdown
 {
+    using System.Globalization;
+
     public partial class Form1 : Form
     {
         public Form1()
@@ -368,12 +370,12 @@ namespace NYCountdown
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            TimeSpan timeSpan = new DateTime(2013, 1, 1, 0, 0, 0) - DateTime.Now;
+            TimeSpan timeSpan = new DateTime(2014,1,1) - DateTime.Now;
 
-            days = Math.Floor(timeSpan.TotalDays) + "";
-            hours = timeSpan.Hours + "";
-            minutes = timeSpan.Minutes + "";
-            seconds = timeSpan.Seconds + "";
+            this.days = Math.Floor(timeSpan.TotalDays).ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+            this.hours = timeSpan.Hours.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+            this.minutes = timeSpan.Minutes.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+            this.seconds = timeSpan.Seconds.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
 
             glControl1.Invalidate();
         }
