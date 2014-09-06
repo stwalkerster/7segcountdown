@@ -1,13 +1,34 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using OpenTK.Graphics.OpenGL;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Form1.cs" company="Simon Walker">
+//   Copyright (C) 2014 Simon Walker
+//   
+//   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
+//   documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+//   the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
+//   to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//   
+//   The above copyright notice and this permission notice shall be included in all copies or substantial portions of 
+//   the Software.
+//   
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+//   THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+//   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+//   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+//   SOFTWARE.
+// </copyright>
+// <summary>
+//   Defines the Form1 type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace NYCountdown
 {
+    using System;
+    using System.Drawing;
     using System.Globalization;
+    using System.Windows.Forms;
 
-    using Tao.OpenGl;
+    using OpenTK.Graphics.OpenGL;
 
     public partial class Form1 : Form
     {
@@ -36,11 +57,11 @@ namespace NYCountdown
 
         private bool fullscreen;
 
-        private DateTime targetDateTime;
+        private readonly DateTime targetDateTime;
 
         private void glControl1_Load(object sender, EventArgs e)
         {
-            timer1.Start();
+            this.timer1.Start();
         }
 
         private void glControl1_Paint(object sender, PaintEventArgs e)
@@ -53,7 +74,7 @@ namespace NYCountdown
             GL.LoadIdentity();
 
             GL.Scale(0.25, 0.25, 1);
-            double halfwidth = 145*(0.5/91);
+            const double Halfwidth = 145 * (0.5 / 91);
 
             if (this.expired && this.expiredflash)
             {
@@ -68,94 +89,92 @@ namespace NYCountdown
             {
                 GL.PushMatrix();
                 {
-                    GL.Translate(-8 * halfwidth, 0, 0);
+                    GL.Translate(-8 * Halfwidth, 0, 0);
                     drawDays(days);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(-2 * halfwidth, 0, 0);
+                    GL.Translate(-2 * Halfwidth, 0, 0);
                     drawPair(hours);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(1 * halfwidth, 0, 0);
+                    GL.Translate(1 * Halfwidth, 0, 0);
                     drawColon();
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(4 * halfwidth, 0, 0);
+                    GL.Translate(4 * Halfwidth, 0, 0);
                     drawPair(minutes);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(7 * halfwidth, 0, 0);
+                    GL.Translate(7 * Halfwidth, 0, 0);
                     drawColon();
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(10 * halfwidth, 0, 0);
+                    GL.Translate(10 * Halfwidth, 0, 0);
                     drawPair(seconds);
                 }
                 GL.PopMatrix();
-
             }
             else
             {
-
                 GL.PushMatrix();
                 {
-                    GL.Translate(8 * halfwidth, 0, 0);
+                    GL.Translate(8 * Halfwidth, 0, 0);
                     drawMillis(millis);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(-10 * halfwidth, 0, 0);
+                    GL.Translate(-10 * Halfwidth, 0, 0);
                     drawPair(hours);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(-7 * halfwidth, 0, 0);
+                    GL.Translate(-7 * Halfwidth, 0, 0);
                     drawColon();
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(-4 * halfwidth, 0, 0);
+                    GL.Translate(-4 * Halfwidth, 0, 0);
                     drawPair(minutes);
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(-1 * halfwidth, 0, 0);
+                    GL.Translate(-1 * Halfwidth, 0, 0);
                     drawColon();
                 }
                 GL.PopMatrix();
 
                 GL.PushMatrix();
                 {
-                    GL.Translate(2 * halfwidth, 0, 0);
+                    GL.Translate(2 * Halfwidth, 0, 0);
                     drawPair(seconds);
                 }
                 GL.PopMatrix();
             }
 
-            glControl1.SwapBuffers();
+            this.glControl1.SwapBuffers();
         }
 
         #region segments
