@@ -44,10 +44,12 @@
             this.glControl1.VSync = true;
             this.glControl1.Load += new System.EventHandler(this.glControl1_Load);
             this.glControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl1_Paint);
+            this.glControl1.DoubleClick += new System.EventHandler(this.glControl1_DoubleClick);
             this.glControl1.Resize += new System.EventHandler(this.glControl1_Resize);
             // 
             // timer1
             // 
+            this.timer1.Interval = 25;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1

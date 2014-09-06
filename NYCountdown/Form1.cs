@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
 
@@ -8,14 +7,36 @@ namespace NYCountdown
 {
     using System.Globalization;
 
+    using Tao.OpenGl;
+
     public partial class Form1 : Form
     {
         public Form1()
         {
             InitializeComponent();
+
+            this.targetDateTime = new DateTime(
+                Program.year,
+                Program.month,
+                Program.day,
+                Program.hour,
+                Program.min,
+                Program.sec);
+
+            this.Text = this.targetDateTime.ToShortDateString() + @" " + this.targetDateTime.ToLongTimeString();
         }
 
         private string days = "0", hours = "0", minutes = "0", seconds = "0";
+
+        private string millis = "0";
+
+        private bool expired, expiredflash;
+
+        private Color foreColor = Color.White, backColor = Color.Black;
+
+        private bool fullscreen;
+
+        private DateTime targetDateTime;
 
         private void glControl1_Load(object sender, EventArgs e)
         {
@@ -25,59 +46,114 @@ namespace NYCountdown
         private void glControl1_Paint(object sender, PaintEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.ClearColor(this.backColor);
+
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
             GL.Scale(0.25, 0.25, 1);
             double halfwidth = 145*(0.5/91);
 
-            GL.Color3(Color.Red);
-            GL.PushMatrix();
+            if (this.expired && this.expiredflash)
             {
-                GL.Translate(-8*halfwidth,0,0);
-                drawDays(days);
+                GL.Color3(this.backColor);
             }
-            GL.PopMatrix();
+            else
+            {
+                GL.Color3(this.foreColor);
+            }
 
-          //  GL.Color3(Color.Orange);
-            GL.PushMatrix();
+            if (this.days != "0")
             {
-                GL.Translate(-2 * halfwidth, 0, 0);
-                drawPair(hours);
-            }
-            GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(-8 * halfwidth, 0, 0);
+                    drawDays(days);
+                }
+                GL.PopMatrix();
 
-          //  GL.Color3(Color.Yellow);
-            GL.PushMatrix();
-            {
-                GL.Translate(1 * halfwidth, 0, 0);
-                drawColon();
-            }
-            GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(-2 * halfwidth, 0, 0);
+                    drawPair(hours);
+                }
+                GL.PopMatrix();
 
-          //  GL.Color3(Color.GreenYellow);
-            GL.PushMatrix();
-            {
-                GL.Translate(4 * halfwidth, 0, 0);
-                drawPair(minutes);
-            }
-            GL.PopMatrix();
+                GL.PushMatrix();
+                {
+                    GL.Translate(1 * halfwidth, 0, 0);
+                    drawColon();
+                }
+                GL.PopMatrix();
 
-          //  GL.Color3(Color.Cyan);
-            GL.PushMatrix();
-            {
-                GL.Translate(7 * halfwidth, 0, 0);
-                drawColon();
+                GL.PushMatrix();
+                {
+                    GL.Translate(4 * halfwidth, 0, 0);
+                    drawPair(minutes);
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(7 * halfwidth, 0, 0);
+                    drawColon();
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(10 * halfwidth, 0, 0);
+                    drawPair(seconds);
+                }
+                GL.PopMatrix();
+
             }
-            GL.PopMatrix();
-            
-           // GL.Color3(Color.Blue);
-            GL.PushMatrix();
+            else
             {
-                GL.Translate(10 * halfwidth, 0, 0);
-                drawPair(seconds);
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(8 * halfwidth, 0, 0);
+                    drawMillis(millis);
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(-10 * halfwidth, 0, 0);
+                    drawPair(hours);
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(-7 * halfwidth, 0, 0);
+                    drawColon();
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(-4 * halfwidth, 0, 0);
+                    drawPair(minutes);
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(-1 * halfwidth, 0, 0);
+                    drawColon();
+                }
+                GL.PopMatrix();
+
+                GL.PushMatrix();
+                {
+                    GL.Translate(2 * halfwidth, 0, 0);
+                    drawPair(seconds);
+                }
+                GL.PopMatrix();
             }
-            GL.PopMatrix();
 
             glControl1.SwapBuffers();
         }
@@ -370,12 +446,34 @@ namespace NYCountdown
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            TimeSpan timeSpan = new DateTime(2014,1,1) - DateTime.Now;
+            int fadeTime = 255;
+            TimeSpan timeSpan = this.targetDateTime - DateTime.Now;
 
-            this.days = Math.Floor(timeSpan.TotalDays).ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
-            this.hours = timeSpan.Hours.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
-            this.minutes = timeSpan.Minutes.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
-            this.seconds = timeSpan.Seconds.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+            this.expiredflash = Math.Abs(timeSpan.Milliseconds) < 500;
+
+            if (this.expired)
+            {
+                this.days = "0";
+                this.hours = "0";
+                this.minutes = "0";
+                this.seconds = "0";
+                this.millis = "0";
+            }
+            else
+            {
+                this.expired = timeSpan.Milliseconds < 0;
+
+                this.days = Math.Floor(timeSpan.TotalDays).ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+                this.hours = timeSpan.Hours.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+                this.minutes = timeSpan.Minutes.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+                this.seconds = timeSpan.Seconds.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty);
+                this.millis = timeSpan.Milliseconds.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty); 
+            }
+
+            if (Math.Abs(timeSpan.TotalSeconds) < fadeTime)
+            {
+                this.backColor = Color.FromArgb(0, 255 - (int)Math.Abs(timeSpan.TotalSeconds), 0, 0);
+            }
 
             glControl1.Invalidate();
         }
@@ -489,6 +587,52 @@ namespace NYCountdown
             }
             GL.PopMatrix();
 
+        }
+
+        private void drawMillis(string data)
+        {
+            double sep = 145 * (0.5 / 91);
+
+            if (data.Length < 3)
+            {
+                data = data.PadLeft(3, '0');
+            }
+
+            GL.PushMatrix();
+            {
+                GL.Translate(-sep, 0, 0);
+                drawChar(data[0]); //1
+                GL.Translate(-(sep * 2), 0, 0);
+                drawColon(); //0
+            }
+            GL.PopMatrix();
+            GL.PushMatrix();
+            {
+                GL.Translate(sep, 0, 0);
+                drawChar(data[1]); // 2
+                GL.Translate((sep * 2), 0, 0);
+                drawChar(data[2]); // 3
+            }
+            GL.PopMatrix();
+
+        }
+
+        private void glControl1_DoubleClick(object sender, EventArgs e)
+        {
+            if (!this.fullscreen)
+            {
+                this.TopMost = true;
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.WindowState = FormWindowState.Maximized;
+                this.fullscreen = true;
+            }
+            else
+            {
+                this.TopMost = false;
+                this.FormBorderStyle = FormBorderStyle.Sizable;
+                this.WindowState = FormWindowState.Normal;
+                this.fullscreen = false;
+            }
         }
 
     }
