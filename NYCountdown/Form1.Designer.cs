@@ -45,6 +45,7 @@
             this.glControl1.Load += new System.EventHandler(this.glControl1_Load);
             this.glControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl1_Paint);
             this.glControl1.DoubleClick += new System.EventHandler(this.glControl1_DoubleClick);
+            this.glControl1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.glControl1_PreviewKeyDown);
             this.glControl1.Resize += new System.EventHandler(this.glControl1_Resize);
             // 
             // timer1

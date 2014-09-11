@@ -36,7 +36,7 @@ namespace NYCountdown
         {
             InitializeComponent();
 
-            this.targetDateTime = new DateTime(
+            this.TargetDateTime = new DateTime(
                 Program.year,
                 Program.month,
                 Program.day,
@@ -44,7 +44,6 @@ namespace NYCountdown
                 Program.min,
                 Program.sec);
 
-            this.Text = this.targetDateTime.ToShortDateString() + @" " + this.targetDateTime.ToLongTimeString();
         }
 
         private string days = "0", hours = "0", minutes = "0", seconds = "0";
@@ -57,7 +56,22 @@ namespace NYCountdown
 
         private bool fullscreen;
 
-        private readonly DateTime targetDateTime;
+        private DateTime targetDateTime;
+
+        public DateTime TargetDateTime
+        {
+            get
+            {
+                return this.targetDateTime;
+            }
+
+            set
+            {
+                this.targetDateTime = value;
+
+                this.Text = this.TargetDateTime.ToShortDateString() + @" " + this.TargetDateTime.ToLongTimeString();
+            }
+        }
 
         private void glControl1_Load(object sender, EventArgs e)
         {
@@ -466,7 +480,7 @@ namespace NYCountdown
         private void timer1_Tick(object sender, EventArgs e)
         {
             int fadeTime = 255;
-            TimeSpan timeSpan = this.targetDateTime - DateTime.Now;
+            TimeSpan timeSpan = this.TargetDateTime - DateTime.Now;
 
             this.expiredflash = Math.Abs(timeSpan.Milliseconds) < 500;
 
@@ -653,6 +667,42 @@ namespace NYCountdown
                 this.fullscreen = false;
             }
         }
+
+        private void glControl1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            var val = 5;
+
+            if (e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
+            {
+                if (e.Control)
+                {
+                    val = 1;
+                }
+
+                if (e.KeyCode == Keys.Left)
+                {
+                    val *= -1;
+                }
+
+                if (e.Shift)
+                {
+                    this.TargetDateTime = this.TargetDateTime.Subtract(new TimeSpan(0, 0, val, 0));
+                }
+                else if (e.Alt)
+                {
+                    this.TargetDateTime = this.TargetDateTime.Subtract(new TimeSpan(0, val, 0, 0));
+                }
+                else
+                {
+                    this.TargetDateTime = this.TargetDateTime.Subtract(new TimeSpan(0, 0, 0, val));
+                }
+
+                this.expired = false;
+                this.expiredflash = false;
+            }
+        }
+
+
 
     }
 }
