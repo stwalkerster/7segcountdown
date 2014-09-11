@@ -503,12 +503,37 @@ namespace NYCountdown
                 this.millis = timeSpan.Milliseconds.ToString(CultureInfo.InvariantCulture).Replace("-", string.Empty); 
             }
 
-            if (Math.Abs(timeSpan.TotalSeconds) < fadeTime)
+
+            if (timeSpan.TotalSeconds > 0)
             {
-                this.backColor = Color.FromArgb(0, 255 - (int)Math.Abs(timeSpan.TotalSeconds), 0, 0);
+                if (Math.Abs(timeSpan.TotalSeconds) < fadeTime)
+                {
+                    this.backColor = Color.FromArgb(0, 255 - (int)Math.Abs(timeSpan.TotalSeconds), 0, 0);
+                }
+                else
+                {
+                    this.backColor = Color.Black;
+                }
+
+                this.foreColor = Color.White;
+            }
+            else
+            {
+                if (Math.Abs(timeSpan.TotalSeconds) < fadeTime)
+                {
+                    this.backColor = Color.FromArgb(0, 255 - (int)Math.Abs(timeSpan.TotalSeconds), 0, 0);
+                }
+
+                var d = Math.Abs(timeSpan.TotalSeconds) - fadeTime;
+                if (d > 0)
+                {
+                    var red = 255 - (int)Math.Min(d, 255);
+
+                    this.foreColor = Color.FromArgb(0, red, red, red);
+                }
             }
 
-            glControl1.Invalidate();
+            this.glControl1.Invalidate();
         }
 
         private void drawDot()
