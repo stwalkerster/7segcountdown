@@ -567,6 +567,16 @@ namespace NYCountdown
             GL.PopMatrix();
         }
 
+        private void drawDecimalPoint()
+        {
+            GL.PushMatrix();
+            {
+                GL.Translate(0.5, -1, 0);
+                this.drawDot();
+            }
+            GL.PopMatrix();
+        }
+
         private void drawPair(string data)
         {
             double sep = 145*(0.5/91);
@@ -659,17 +669,17 @@ namespace NYCountdown
             GL.PushMatrix();
             {
                 GL.Translate(-sep, 0, 0);
-                drawChar(data[0]); //1
+                this.drawChar(data[0]); //1
                 GL.Translate(-(sep * 2), 0, 0);
-                drawColon(); //0
+                this.drawDecimalPoint(); //0
             }
             GL.PopMatrix();
             GL.PushMatrix();
             {
                 GL.Translate(sep, 0, 0);
-                drawChar(data[1]); // 2
+                this.drawChar(data[1]); // 2
                 GL.Translate((sep * 2), 0, 0);
-                drawChar(data[2]); // 3
+                this.drawChar(data[2]); // 3
             }
             GL.PopMatrix();
 
